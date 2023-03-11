@@ -34,6 +34,7 @@ endif()
 #===============================================================================
 add_library(CountPass SHARED countpass.cpp)
 add_library(CSE SHARED cse.cpp)
+add_library(CONSTPROP SHARED constprop.cpp)
 add_library(SSA SHARED ssa.cpp)
 
 
@@ -42,4 +43,6 @@ add_library(SSA SHARED ssa.cpp)
 target_link_libraries(CountPass
   "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")
   target_link_libraries(CSE
+  "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")
+target_link_libraries(CONSTPROP
   "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>")
