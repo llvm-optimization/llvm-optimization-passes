@@ -1,12 +1,13 @@
 #include "../include/constprop.h"
+#include <vector>
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
+#include "llvm/Support/raw_ostream.h"
 using namespace llvm;
 
 // USAGE: New PM
      // opt -load-pass-plugin=build/libConstantPropagation.so -passes="const-prop" -disable-output main.ll
 
-namespace {
-
-struct ConstantPropagation : PassInfoMixin<ConstantPropagation> {
 
   // Check if constants have the right size
   bool is_constant(Value *op, int &constant)
@@ -22,17 +23,6 @@ struct ConstantPropagation : PassInfoMixin<ConstantPropagation> {
         }
      }
      return false;
-  }
-
-  //Run function for new pass manager
-  llvm::PreservedAnalyses run(Function &F, FunctionAnalysisManager &AM) {
-
-    //
-    for(auto& basicb : F){
-      constProp(&basicb);
-    }
-
-    return llvm::PreservedAnalyses::all();
   }
 
   //
@@ -112,11 +102,16 @@ struct ConstantPropagation : PassInfoMixin<ConstantPropagation> {
     return true;
   }
 
-  // Without isRequired returning true, this pass will be skipped for functions
-  // decorated with the optnone LLVM attribute. Note that clang -O0 decorates
-  // all functions with optnone.
-  static bool isRequired() { return true; }
-};
+  //Run function for new pass manager
+  llvm::PreservedAnalyses run(Function &F, FunctionAnalysisManager &AM) {
+
+    //
+    for(auto& basicb : F){
+      constProp(&basicb);
+    }
+
+    return llvm::PreservedAnalyses::all();
+  }
 
 //-----------------------------------------------------------------------------
 // New PM Registration
@@ -134,7 +129,6 @@ llvm::PassPluginLibraryInfo getConstantPropagationPluginInfo() {
                   return false;
                 });
           }};
-}
 }
 
 extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
